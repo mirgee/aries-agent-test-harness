@@ -8,10 +8,14 @@ name: test-harness-ariesvcx-ariesvcx
 # Passing tests: @T003-RFC0036 @T001-RFC0160 @T002-RFC0160 @T003-RFC0160 @T001-RFC0037
 # 
 # End
+  # on:
+  #   workflow_dispatch:
+  #   schedule:
+  #     - cron: "35 0 * * *"
 on:
-  workflow_dispatch:
-  schedule:
-    - cron: "0 1 * * *"
+  push:
+    branches:
+      - "**"
 defaults:
   run:
     shell: bash
