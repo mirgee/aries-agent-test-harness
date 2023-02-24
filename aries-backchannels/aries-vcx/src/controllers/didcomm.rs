@@ -48,11 +48,17 @@ impl HarnessAgent {
                         }
                     }
                 };
-                self.aries_agent
-                    .connections()
-                    .accept_request(&connection_id, request)
-                    .await
-                    .ok();
+                if self.aries_agent.connections().exists_by_id(&connection_id) {
+                    self.aries_agent
+                        .connections()
+                        .accept_request(&connection_id, request)
+                        .await?;
+                } else {
+                    self.aries_agent
+                        .connections()
+                        .create_from_request(request)
+                        .await?;
+                }
             }
             A2AMessage::ConnectionResponse(response) => {
                 self.aries_agent
@@ -86,9 +92,11 @@ impl HarnessAgent {
                 }
             }
             A2AMessage::CredentialRequest(request) => {
-                self.aries_agent
-                    .issuer()
-                    .process_credential_request(&request.get_thread_id(), request)?;
+                self.aries_agent.issuer().process_credential_request(
+                    &request.get_thread_id(),
+                    connection_ids.last().map(|s| s.as_str()),
+                    request,
+                )?;
             }
             A2AMessage::Credential(credential) => {
                 self.aries_agent

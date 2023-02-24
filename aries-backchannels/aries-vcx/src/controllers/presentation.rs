@@ -80,6 +80,13 @@ fn to_backchannel_state_verifier(state: VerifierState) -> State {
 }
 
 impl HarnessAgent {
+    pub async fn create_proof_request(
+        &self,
+        presentation_request: &PresentationRequestWrapper,
+    ) -> HarnessResult<String> {
+        todo!()
+    }
+
     pub async fn send_proof_request(
         &self,
         presentation_request: &PresentationRequestWrapper,
@@ -180,6 +187,14 @@ impl HarnessAgent {
         };
         Ok(json!({ "state": state }).to_string())
     }
+}
+
+#[post("/create-request")]
+pub async fn create_proof_request(
+    req: web::Json<Request<PresentationRequestWrapper>>,
+    agent: web::Data<RwLock<HarnessAgent>>,
+) -> impl Responder {
+    agent.read().unwrap().create_proof_request(&req.data).await
 }
 
 #[post("/send-request")]

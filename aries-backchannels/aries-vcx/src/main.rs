@@ -10,21 +10,17 @@ extern crate serde_json;
 #[macro_use]
 extern crate log;
 extern crate aries_vcx_agent;
+extern crate bs58;
 extern crate clap;
+extern crate mime;
 extern crate reqwest;
 extern crate uuid;
 
 use std::sync::RwLock;
 
 use crate::controllers::{
-    connection,
-    credential_definition,
-    general,
-    issuance,
-    presentation,
-    revocation,
-    schema,
-    didcomm
+    connection, credential_definition, didcomm, general, issuance, out_of_band, presentation,
+    revocation, schema,
 };
 use actix_web::{middleware, web, App, HttpServer};
 use clap::Parser;
@@ -96,7 +92,9 @@ macro_rules! soft_assert_eq {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    env_logger::init_from_env(env_logger::Env::default().filter_or(env_logger::DEFAULT_FILTER_ENV, "info"));
+    env_logger::init_from_env(
+        env_logger::Env::default().filter_or(env_logger::DEFAULT_FILTER_ENV, "info"),
+    );
     let opts: Opts = Opts::parse();
 
     let host = std::env::var("HOST").unwrap_or("0.0.0.0".to_string());
@@ -121,11 +119,10 @@ async fn main() -> std::io::Result<()> {
                     .configure(issuance::config)
                     .configure(revocation::config)
                     .configure(presentation::config)
-                    .configure(general::config)
+                    .configure(out_of_band::config)
+                    .configure(general::config),
             )
-            .service(
-                web::scope("/didcomm").route("", web::post().to(didcomm::receive_message))
-            )
+            .service(web::scope("/didcomm").route("", web::post().to(didcomm::receive_message)))
     })
     .keep_alive(std::time::Duration::from_secs(30))
     .client_request_timeout(std::time::Duration::from_secs(30))

@@ -98,7 +98,7 @@ pub async fn initialize(port: u32) -> AriesAgent {
             wallet_kdf: "RAW".to_string(),
         },
         agency_config: None,
-        service_endpoint
+        service_endpoint,
     };
     AriesAgent::initialize(init_config).await.unwrap()
 }
