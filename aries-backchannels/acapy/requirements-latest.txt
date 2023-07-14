@@ -1,1 +1,1 @@
-aries-cloudagent
+aries-cloudagent[askar]@git+https://github.com/mirgee/aries-cloudagent-python@e3b518ceb6fe8f38d9c3a74904af6114b6b51153

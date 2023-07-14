@@ -1,11 +1,17 @@
-FROM python:3.9-slim-bullseye
+FROM python:3.9.17-slim-bullseye
 
 RUN apt-get update \
    && apt-get install -y git gnupg2 software-properties-common curl \
-   && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CE7709D068DB5E88 \
-   && add-apt-repository 'deb https://repo.sovrin.org/sdk/deb bionic stable' \
-   && apt-get update \
-   && apt-get install -y libindy libnullpay
+   && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CE7709D068DB5E88
+
+RUN echo 'Acquire::https::repo.sovrin.org {\
+   Verify-Peer "false";\
+   Verify-Host "false";\
+};' > /etc/apt/apt.conf.d/99verify-peer
+
+# RUN add-apt-repository 'deb https://repo.sovrin.org/sdk/deb bionic main' \
+#    && apt-get update \
+#    && apt-get install -y libindy
 
 RUN mkdir -p /aries-backchannels
 WORKDIR /aries-backchannels

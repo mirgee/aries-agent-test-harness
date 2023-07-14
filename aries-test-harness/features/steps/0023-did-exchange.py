@@ -143,6 +143,7 @@ def step_impl(context, requester: str, responder: str):
 def step_impl(context, responder: str):
     responder_url = context.config.userdata.get(responder)
 
+    time.sleep(1)
     (resp_status, resp_text) = agent_backchannel_POST(
         responder_url + "/agent/command/",
         "did-exchange",
@@ -341,6 +342,7 @@ def step_impl(context, responder: str, requester: str):
     if mediator:
         data["mediator_connection_id"] = context.connection_id_dict[responder][mediator]
 
+    time.sleep(1)
     (resp_status, resp_text) = agent_backchannel_POST(
         responder_url + "/agent/command/",
         "did-exchange",
@@ -356,6 +358,7 @@ def step_impl(context, responder, requester):
     responder_connection_id = context.connection_id_dict[responder][requester]
     responder_url = context.config.userdata.get(responder)
 
+    time.sleep(1)
     (resp_status, resp_text) = agent_backchannel_POST(
         responder_url + "/agent/command/",
         "did-exchange",
@@ -374,6 +377,7 @@ def step_impl(context, requester):
     requester_url: str = context.config.userdata.get(requester)
 
     # This should be response-received but is completed. Chat with SKlump on this issue.
+    time.sleep(1)
     assert expected_agent_state(
         requester_url, "did-exchange", requester_connection_id, "completed"
     )

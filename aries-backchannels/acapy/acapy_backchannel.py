@@ -230,12 +230,14 @@ class AcaPyAgentBackchannel(AgentBackchannel):
             ("--admin", "0.0.0.0", str(self.agent_ports["admin"])),
             "--admin-insecure-mode",
             "--public-invites",
-            ("--wallet-type", self.wallet_type),
+            ("--wallet-type", "askar"),
             ("--wallet-name", self.wallet_name),
             ("--wallet-key", self.wallet_key),
             "--monitor-revocation-notification",
             "--notify-revocation",
             "--open-mediation",
+            "--send-peer-did",
+            "--requests-through-public-did",
             "--enable-undelivered-queue",
             "--preserve-exchange-records", # For AATH purposes, exchange records must be retained -- not typical in production
         ]
