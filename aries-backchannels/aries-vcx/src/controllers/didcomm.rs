@@ -162,26 +162,23 @@ impl HarnessAgent {
                 msg_buffer.write().unwrap().push(request.into());
             }
             DidExchange::Response(response) => {
-                let thread_id = response.decorators.thread.thid.clone();
                 let res = self
                     .aries_agent
                     .did_exchange()
-                    .send_complete(&thread_id, response)
+                    .send_complete(response)
                     .await;
                 if let Err(err) = res {
                     error!("Error sending complete: {:?}", err);
                 };
             }
             DidExchange::Complete(complete) => {
-                let thread_id = complete.decorators.thread.thid.clone();
-                self.aries_agent
-                    .did_exchange()
-                    .receive_complete(&thread_id, complete)
-                    .await?;
+                self.aries_agent.did_exchange().receive_complete(complete)?;
             }
             DidExchange::ProblemReport(problem_report) => {
-                // TODO: Handle transition to abandoned
-                error!("Received problem report: {:?}", problem_report);
+                let thread_id = problem_report.decorators.thread.thid.clone();
+                self.aries_agent
+                    .did_exchange()
+                    .receive_problem_report(&thread_id, problem_report)?;
             }
         };
         Ok(())
