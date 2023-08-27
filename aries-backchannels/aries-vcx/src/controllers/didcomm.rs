@@ -192,52 +192,35 @@ impl HarnessAgent {
         payload: Vec<u8>,
         msg_buffer: web::Data<RwLock<Vec<AriesMessage>>>,
     ) -> HarnessResult<HttpResponse> {
-        if let Ok((message, sender_vk)) = EncryptionEnvelope::anon_unpack(
+        let (message, sender_vk) = EncryptionEnvelope::anon_unpack(
             &self.aries_agent.profile().inject_wallet(),
             payload.clone(),
         )
-        .await
-        {
-            let sender_vk = sender_vk.ok_or_else(|| {
-                HarnessError::from_msg(
-                    HarnessErrorType::EncryptionError,
-                    "Received anoncrypted message",
-                )
-            })?;
-            info!("Received message: {:?}", message);
-            let connection_ids = self.aries_agent.connections().get_by_their_vk(&sender_vk)?;
-            match message {
-                AriesMessage::Connection(msg) => self.handle_connection_msg(msg).await?,
-                AriesMessage::CredentialIssuance(msg) => {
-                    self.handle_issuance_msg(msg, connection_ids, &sender_vk)
-                        .await?
-                }
-                AriesMessage::DidExchange(msg) => {
-                    self.handle_did_exchange_msg(msg, msg_buffer).await?
-                }
-                AriesMessage::PresentProof(msg) => {
-                    self.handle_presentation_msg(msg, connection_ids, &sender_vk)
-                        .await?
-                }
-                m @ _ => {
-                    warn!("Received message of unexpected type: {:?}", m);
-                }
-            };
-            Ok(HttpResponse::Ok().finish())
-        } else {
-            // TODO: For some reason, acapy sends didexchange messages unencrypted
-            let message: AriesMessage = serde_json::from_slice(&payload)?;
-            warn!("Received unencrypted message: {:?}", message);
-            match message {
-                AriesMessage::DidExchange(msg) => {
-                    self.handle_did_exchange_msg(msg, msg_buffer).await?
-                }
-                m @ _ => {
-                    warn!("Received message of unexpected type: {:?}", m);
-                }
-            };
-            Ok(HttpResponse::Ok().finish())
-        }
+        .await?;
+        let sender_vk = sender_vk.ok_or_else(|| {
+            HarnessError::from_msg(
+                HarnessErrorType::EncryptionError,
+                "Received anoncrypted message",
+            )
+        })?;
+        info!("Received message: {:?}", message);
+        let connection_ids = self.aries_agent.connections().get_by_their_vk(&sender_vk)?;
+        match message {
+            AriesMessage::Connection(msg) => self.handle_connection_msg(msg).await?,
+            AriesMessage::CredentialIssuance(msg) => {
+                self.handle_issuance_msg(msg, connection_ids, &sender_vk)
+                    .await?
+            }
+            AriesMessage::DidExchange(msg) => self.handle_did_exchange_msg(msg, msg_buffer).await?,
+            AriesMessage::PresentProof(msg) => {
+                self.handle_presentation_msg(msg, connection_ids, &sender_vk)
+                    .await?
+            }
+            m @ _ => {
+                warn!("Received message of unexpected type: {:?}", m);
+            }
+        };
+        Ok(HttpResponse::Ok().finish())
     }
 }
 

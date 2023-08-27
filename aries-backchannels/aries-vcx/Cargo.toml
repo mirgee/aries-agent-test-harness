@@ -17,7 +17,8 @@ serde_derive = "1.0.97"
 log = "0.4.17"
 env_logger = "0.9.1"
 uuid = { version = "0.8.2", features = ["serde", "v4"] }
-aries-vcx-agent = { git = "https://github.com/hyperledger/aries-vcx.git", rev = "1372257dd944db49e58a09fbfdf04e2fe430cfef" }
+# aries-vcx-agent = { git = "https://github.com/hyperledger/aries-vcx.git", rev = "a9d9e827add1fd42372281ba2413c56ca519e532" }
+aries-vcx-agent = { path = "/Users/ab006rh/Source/aries-vcx/agents/rust/aries-vcx-agent" }
 
 [profile.release]
 debug = 0

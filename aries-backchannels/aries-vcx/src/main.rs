@@ -14,7 +14,7 @@ extern crate clap;
 extern crate reqwest;
 extern crate uuid;
 
-use std::{collections::HashMap, sync::RwLock};
+use std::sync::RwLock;
 
 use crate::controllers::{
     connection, credential_definition, didcomm, general, issuance, presentation, revocation, schema,

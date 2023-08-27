@@ -137,9 +137,9 @@ impl HarnessAgent {
         Ok(json!({ "state": state }).to_string())
     }
 
-    pub async fn get_did_exchange(&self, id: &str) -> HarnessResult<String> {
-        soft_assert_eq!(self.aries_agent.did_exchange().exists_by_id(id), true);
-        Ok(json!({ "connection_id": id }).to_string())
+    pub async fn get_invitation_id(&self, id: &str) -> HarnessResult<String> {
+        let invitation_id = self.aries_agent.did_exchange().invitation_id(id)?;
+        Ok(json!({ "connection_id": invitation_id }).to_string())
     }
 }
 
@@ -199,14 +199,14 @@ async fn send_did_exchange_response(
 }
 
 #[get("/{thread_id}")]
-async fn get_did_exchange(
+async fn get_invitation_id(
     agent: web::Data<RwLock<HarnessAgent>>,
     path: web::Path<String>,
 ) -> impl Responder {
     agent
         .read()
         .unwrap()
-        .get_did_exchange(&path.into_inner())
+        .get_invitation_id(&path.into_inner())
         .await
 }
 
@@ -231,5 +231,5 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(send_did_exchange_request_resolvable_did)
             .service(get_did_exchange_state),
     )
-    .service(web::scope("/response/did-exchange").service(get_did_exchange));
+    .service(web::scope("/response/did-exchange").service(get_invitation_id));
 }
